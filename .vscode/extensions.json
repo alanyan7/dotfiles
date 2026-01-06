@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "dracula-theme.theme-dracula",
+    "ms-python.python",
+    "redhat.vscode-yaml",
+    "ckolkman.vscode-postgres",
+    "oderwat.indent-rainbow",
+    "GitHub.vscode-pull-request-github",
+    "eamodio.gitlens",
+    "tamasfe.even-better-toml"
+  ]
+}
+

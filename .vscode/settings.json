@@ -1,0 +1,9 @@
+{
+  "workbench.colorTheme": "Dracula Theme",
+  "editor.indentSize": 2,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
+
