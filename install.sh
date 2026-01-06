@@ -3,6 +3,9 @@
 
 set -x
 
+# install oh-my-zsh (without changing shell to avoid interrupting script)
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
 # replace the default theme
 sed -i '' -e 's/ZSH_THEME.*/ZSH_THEME="tjkirch"/' ~/.zshrc
 
@@ -20,13 +23,6 @@ cat ./shell_functions.sh >> ~/.zshrc  # TODO: prevent duplicate appends
 
 # config vim
 ./install-vim.sh
-
-# install tmux
-brew install tmux 
-
-# tmux configs
-cp ./.tmux.conf ~/.tmux.conf
-tmux source-file ~/.tmux.conf
 
 
 echo "RUN 'source ~/.zshrc'"
