@@ -23,6 +23,7 @@ cat ./shell_functions.sh >> ~/.zshrc  # TODO: prevent duplicate appends
 
 # config vim
 ./install-vim.sh
+./install-tmux.sh
 
 
 echo "RUN 'source ~/.zshrc'"
