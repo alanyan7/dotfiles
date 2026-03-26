@@ -12,7 +12,7 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 ## Quick install (one-liner)
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ComeOnGetMe/dotfiles/master/install.sh)"
+bash <(curl -fsSL https://raw.githubusercontent.com/ComeOnGetMe/dotfiles/master/install.sh)
 ```
 
 This clones the repo to `~/.dotfiles` (if not already present) and runs the full setup. No authentication required.
