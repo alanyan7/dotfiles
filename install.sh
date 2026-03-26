@@ -2,19 +2,22 @@
 set -euo pipefail
 
 # ── Bootstrap: support both local and remote (curl | bash) execution ──
-DOTFILES_REPO="https://github.com/zhipeng-yan/dotfiles.git"
+DOTFILES_REPO="https://github.com/ComeOnGetMe/dotfiles.git"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 
-if [ ! -f "./install-tmux.sh" ]; then
+# When piped from curl, BASH_SOURCE is empty — clone the repo first.
+# When run as ./install.sh from inside the repo, skip straight ahead.
+if [ -z "${BASH_SOURCE[0]:-}" ] || [ ! -f "$(dirname "${BASH_SOURCE[0]}")/install-tmux.sh" ]; then
   echo "==> Bootstrapping: cloning dotfiles into $DOTFILES_DIR"
   if [ ! -d "$DOTFILES_DIR" ]; then
     git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
   fi
   cd "$DOTFILES_DIR"
+else
+  cd "$(dirname "${BASH_SOURCE[0]}")"
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
-cd "$SCRIPT_DIR"
+SCRIPT_DIR="$(pwd -P)"
 
 # ── Helpers ──
 
