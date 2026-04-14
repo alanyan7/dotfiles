@@ -131,6 +131,9 @@ info "Installing tmux..."
 info "Installing CLI utilities..."
 "$SCRIPT_DIR/install-utils.sh"
 
+info "Installing Claude Code config..."
+"$SCRIPT_DIR/install-claude.sh"
+
 # ── Done ──
 
 echo ""
