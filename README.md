@@ -6,8 +6,8 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 
 - **zsh** with [Oh My Zsh](https://ohmyz.sh/), custom plugins (autosuggestions, syntax highlighting, navigation tools), and the `tjkirch` theme
 - **tmux** with mouse support, vim-aware pane navigation, and intuitive split bindings
-- **CLI utilities**: fzf, ripgrep, fd, bat, eza, git-delta, zoxide, tldr
 - **vim** with Vundle plugins and solarized colors
+- **Claude Code config**: `CLAUDE.md`, personal skills, statusline, and `settings.json`
 
 ## Quick install (one-liner)
 
@@ -30,23 +30,24 @@ cd ~/.dotfiles
 Run individual installers if you only want some components:
 
 ```bash
-./install-tmux.sh    # tmux + config
-./install-utils.sh   # CLI utilities (fzf, ripgrep, fd, bat, eza, delta, zoxide, tldr)
-./install-vim.sh     # vim + Vundle plugins
+./install-tmux.sh             # tmux + config
+./install-vim.sh              # vim + Vundle plugins
+./install-claude.sh           # Claude Code config (missing files only)
+./install-claude.sh --force   # Claude Code config (overwrite existing)
 ```
 
-## What gets installed
+## Claude Code config
 
-| Tool | Replaces | Purpose |
-|------|----------|---------|
-| [fzf](https://github.com/junegunn/fzf) | - | Fuzzy finder for files, history, etc. |
-| [ripgrep](https://github.com/BurntSushi/ripgrep) | `grep` | Fast regex search |
-| [fd](https://github.com/sharkdp/fd) | `find` | Fast file finder |
-| [bat](https://github.com/sharkdp/bat) | `cat` | Syntax-highlighted file viewer |
-| [eza](https://github.com/eza-community/eza) | `ls` | Modern file listing with git status |
-| [git-delta](https://github.com/dandavison/delta) | `diff` | Better git diffs |
-| [zoxide](https://github.com/ajeetdsouza/zoxide) | `cd`/`z` | Smart directory jumping |
-| [tldr](https://github.com/tldr-pages/tldr) | `man` | Simplified command examples |
+`install-claude.sh` is conservative by default — it only installs files that don't already exist on the target machine. Pass `--force` to overwrite (the existing `~/.claude/settings.json` is backed up first).
+
+What it installs:
+
+- `~/.claude/CLAUDE.md` — global behavioral guidelines (Karpathy-inspired)
+- `~/.claude/skills/<name>/` — personal skills
+- `~/.claude/statusline-command.sh` — statusline script
+- `~/.claude/settings.json` — preferences (theme, hooks, permissions)
+
+After install, sign in with `claude auth login` and restart any running Claude Code sessions.
 
 ## Customization
 

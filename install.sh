@@ -128,9 +128,6 @@ cp "$SCRIPT_DIR/zshrc.local" "$ZSHRC_LOCAL"
 info "Installing tmux..."
 "$SCRIPT_DIR/install-tmux.sh"
 
-info "Installing CLI utilities..."
-"$SCRIPT_DIR/install-utils.sh"
-
 info "Installing Claude Code config..."
 "$SCRIPT_DIR/install-claude.sh"
 
