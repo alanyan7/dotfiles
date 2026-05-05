@@ -38,6 +38,30 @@ if [ ! -d "$SRC" ]; then
   exit 1
 fi
 
+# ── claude CLI ──
+# Native build installs into ~/.local/share/claude/versions/<v>/ and symlinks
+# ~/.local/bin/claude. Skip if already on PATH (use `claude install latest` to
+# update later).
+if command -v claude >/dev/null 2>&1; then
+  CLAUDE_VERSION="$(claude --version 2>/dev/null | head -1 || echo unknown)"
+  skip "claude CLI already installed ($CLAUDE_VERSION)"
+else
+  if ! command -v curl >/dev/null 2>&1; then
+    error "curl is required to install the claude CLI."
+    exit 1
+  fi
+  info "Installing claude CLI from https://claude.ai/install.sh"
+  curl -fsSL https://claude.ai/install.sh | bash
+  # Make sure ~/.local/bin is on PATH for the verification below.
+  case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) PATH="$HOME/.local/bin:$PATH" ;; esac
+  if command -v claude >/dev/null 2>&1; then
+    info "claude installed: $(claude --version 2>/dev/null | head -1)"
+  else
+    error "claude install ran but the binary is not on PATH. Add ~/.local/bin to PATH and re-run."
+    exit 1
+  fi
+fi
+
 mkdir -p "$DST" "$DST/skills"
 
 # ── settings.json ── (template: __HOME__ → $HOME)
