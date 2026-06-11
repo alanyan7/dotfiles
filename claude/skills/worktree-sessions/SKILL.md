@@ -1,13 +1,13 @@
 ---
 name: worktree-sessions
-description: Spawn a detached tmux session running `claude -n <slug>` inside a git worktree — either by creating a brand-new worktree+branch from a slug, or by attaching to an existing worktree path. INVOKE THIS SKILL — DO NOT do the work in the current session — whenever the user asks to "create another session", "spin up a session", "start a new session", "make a session", "spawn a session", "create a session for / from / with a worktree", "open another claude in a worktree", "fork off a worktree session", "launch a session for an existing worktree", or any phrasing that combines spawning a tmux/claude session with a worktree (new or existing). Output is always a detached tmux session, never inline work in the current session.
+description: Spawn a detached tmux session running `claude --remote-control <slug>` inside a git worktree — either by creating a brand-new worktree+branch from a slug, or by attaching to an existing worktree path. INVOKE THIS SKILL — DO NOT do the work in the current session — whenever the user asks to "create another session", "spin up a session", "start a new session", "make a session", "spawn a session", "create a session for / from / with a worktree", "open another claude in a worktree", "fork off a worktree session", "launch a session for an existing worktree", or any phrasing that combines spawning a tmux/claude session with a worktree (new or existing). Output is always a detached tmux session, never inline work in the current session.
 argument-hint: <slug-or-existing-worktree-path>
 allowed-tools: Bash(git worktree *), Bash(git branch *), Bash(git rev-parse *), Bash(git -C *), Bash(git status *), Bash(tmux *), Bash(ls *), Bash(test *), Bash(echo *), Bash(printf *), Bash(which *), Bash(mkdir *), Bash(cp *), Bash(cat *), Bash(jq *), Bash(bash *), Bash(whoami *), Bash(realpath *), Bash(basename *), Bash(dirname *), AskUserQuestion
 ---
 
 # Worktree Sessions
 
-Spawn one detached tmux session running `claude -n <slug>` inside a git worktree. The skill works in two modes:
+Spawn one detached tmux session running `claude --remote-control <slug>` inside a git worktree. `--remote-control` (vs plain `-n`) is required for the session to appear in the Claude Code desktop app. The skill works in two modes:
 
 - **Create mode** — input is a kebab-case slug → create a new branch + new worktree at `~/.claude-worktrees/<slug>/`, then spawn the session.
 - **Attach mode** — input is a path to an existing worktree → spawn a session for it (rename the directory if it has a legacy `<USER>-` prefix so the CC TUI displays the slug cleanly).
@@ -87,7 +87,7 @@ Let `USER=$(whoami | cut -d_ -f1)` (drop any `_` suffix, e.g. `zhipeng_yan` → 
 ### Spawn (both modes)
 
 ```bash
-tmux new-session -d -s <slug> -c <worktree-path> "claude -n <slug>"
+tmux new-session -d -s <slug> -c <worktree-path> "claude --remote-control <slug>"
 ```
 
 ### Report
@@ -110,7 +110,7 @@ Session:  tmux attach -t <slug>
 
 ## Failure handling
 
-- If worktree creation/rename succeeds but tmux fails, leave the worktree in place. Tell the user how to spawn manually: `tmux new-session -d -s <slug> -c <path> "claude -n <slug>"`. Don't roll back filesystem state — the user may have intended work on it.
+- If worktree creation/rename succeeds but tmux fails, leave the worktree in place. Tell the user how to spawn manually: `tmux new-session -d -s <slug> -c <path> "claude --remote-control <slug>"`. Don't roll back filesystem state — the user may have intended work on it.
 - If preflight validation fails (existing branch / existing session / existing path / path-not-a-worktree / collision in attach-mode rename), don't change anything; report which check failed and what to do.
 - If `git worktree move` fails (e.g. uncommitted changes blocking the move on some git versions), report the error and offer to skip the rename: spawn the session at the original path instead, with the longer name as the slug.
 
