@@ -96,25 +96,6 @@ if [ -f "$SRC/CLAUDE.md" ]; then
   fi
 fi
 
-# ── bin scripts (helper CLIs onto ~/.local/bin) ──
-if [ -d "$SRC/bin" ]; then
-  BIN_DST="$HOME/.local/bin"
-  mkdir -p "$BIN_DST"
-  info "Installing bin scripts -> $BIN_DST"
-  for f in "$SRC"/bin/*; do
-    [ -f "$f" ] || continue
-    name="$(basename "$f")"
-    target="$BIN_DST/$name"
-    if [ -f "$target" ] && [ "$FORCE" != "1" ]; then
-      skip "  bin already installed: $name (pass --force to overwrite)"
-      continue
-    fi
-    info "  installing bin: $name"
-    cp "$f" "$target"
-    chmod +x "$target"
-  done
-fi
-
 # ── skills (one per directory) ──
 info "Installing skills"
 for dir in "$SRC"/skills/*/; do

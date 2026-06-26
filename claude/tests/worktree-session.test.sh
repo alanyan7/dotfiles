@@ -3,7 +3,7 @@
 set -uo pipefail
 # Resolve the script relative to this test file (portable), allow override.
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-SCRIPT="${SCRIPT:-$HERE/../bin/worktree-session}"
+SCRIPT="${SCRIPT:-$HERE/../skills/worktree-sessions/worktree-session.sh}"
 T=$(mktemp -d /tmp/wtt.XXXXXX)
 export WORKTREE_BASE="$T/wts"
 export WORKTREE_USER="tester"
