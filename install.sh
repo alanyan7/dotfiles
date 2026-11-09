@@ -159,6 +159,9 @@ cp "$SCRIPT_DIR/zshrc.local" "$ZSHRC_LOCAL"
 info "Installing tmux..."
 "$SCRIPT_DIR/install-tmux.sh"
 
+info "Installing GitHub CLI..."
+"$SCRIPT_DIR/install-gh.sh"
+
 info "Installing Claude Code config..."
 "$SCRIPT_DIR/install-claude.sh"
 
