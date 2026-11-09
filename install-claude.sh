@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Install personal Claude Code config: CLAUDE.md, skills, statusline, settings.
+# Install Claude Code (if missing) and personal config: CLAUDE.md, skills,
+# statusline, settings.
 # Conservative by default — never clobbers existing files. Re-running on a
 # machine that already has things set up only fills in what's missing.
 #
@@ -39,16 +40,18 @@ if [ ! -d "$SRC" ]; then
 fi
 
 # ── claude CLI ──
-# Expected to be installed already — this script only installs config. The
-# native installer puts it in ~/.local/bin, which may not be on PATH yet.
+# The native installer puts it in ~/.local/bin, which may not be on PATH yet.
 case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) PATH="$HOME/.local/bin:$PATH" ;; esac
 if command -v claude >/dev/null 2>&1; then
   info "claude CLI found ($(claude --version 2>/dev/null | head -1 || echo unknown))"
 else
-  error "Claude Code (claude) is required but not installed."
-  error "Install it first, then re-run this script:"
-  error "  curl -fsSL https://claude.ai/install.sh | bash"
-  exit 1
+  info "Installing claude CLI from https://claude.ai/install.sh"
+  curl -fsSL https://claude.ai/install.sh | bash
+  if ! command -v claude >/dev/null 2>&1; then
+    error "claude install finished but the binary was not found in ~/.local/bin or on PATH."
+    exit 1
+  fi
+  info "claude installed: $(claude --version 2>/dev/null | head -1)"
 fi
 
 mkdir -p "$DST" "$DST/skills"

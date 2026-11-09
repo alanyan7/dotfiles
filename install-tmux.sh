@@ -7,8 +7,9 @@ error() { printf '\033[1;31m==> %s\033[0m\n' "$*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 
-# Don't let `brew install` ask [y/n] when this script runs on its own.
-export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1
+# Don't let `brew install` or apt ask questions when this script runs on its own.
+export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1 DEBIAN_FRONTEND=noninteractive
+SUDO=sudo; [ "$(id -u)" -eq 0 ] && SUDO=""
 
 # ── Install tmux ──
 
@@ -24,12 +25,12 @@ if ! command -v tmux >/dev/null 2>&1; then
     brew install tmux
   else
     if command -v apt-get >/dev/null 2>&1; then
-      sudo apt-get update -qq
-      sudo apt-get install -y tmux
+      $SUDO apt-get update -qq
+      $SUDO apt-get install -y tmux
     elif command -v yum >/dev/null 2>&1; then
-      sudo yum install -y tmux
+      $SUDO yum install -y tmux
     elif command -v pacman >/dev/null 2>&1; then
-      sudo pacman -Sy --noconfirm tmux
+      $SUDO pacman -Sy --noconfirm tmux
     else
       error "No supported package manager found. Please install tmux manually."
       exit 1

@@ -4,26 +4,31 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 
 ## What's included
 
-- **Homebrew** on macOS, installed first if missing (needs your password once)
+- **Homebrew** on macOS, installed first if missing (needs your password once; also provides git on a bare Mac)
 - **zsh** with [Oh My Zsh](https://ohmyz.sh/), custom plugins (autosuggestions, syntax highlighting, navigation tools), and the `tjkirch` theme
 - **GitHub CLI** (`gh`); sign in afterwards with `gh auth login`
 - **tmux** with mouse support, vim-aware pane navigation, and intuitive split bindings
 - **vim** with Vundle plugins and solarized colors
-- **Claude Code config**: `CLAUDE.md`, personal skills, statusline, and `settings.json`
-- **[autonomOS](https://github.com/aterrylu/autonomOS)** via its official installer (plus Node.js 20+ on macOS if missing); runs as a background service and prints the dashboard URL and token
+- **Claude Code** (installed if missing) and its config: `CLAUDE.md`, personal skills, statusline, and `settings.json`
+- **[autonomOS](https://github.com/aterrylu/autonomOS)** via its official installer (plus Node.js 20+ if missing: Homebrew on macOS, the official build in `~/.local` on Linux); runs as a background service and prints the dashboard URL and token
 
 ## Quick install (one-liner)
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/ComeOnGetMe/dotfiles/master/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/alanyan7/dotfiles/master/install.sh)
 ```
 
-This clones the repo to `~/.dotfiles` (if not already present) and runs the full setup. No authentication required.
+This works on a bare machine (macOS, or Linux with apt, dnf/yum or pacman): it installs git if needed, clones the repo to `~/.dotfiles` (if not already present) and runs the full setup without prompts. No authentication required.
+
+The only things it can't do for you:
+
+- **Your password**, asked once: by Homebrew on macOS, or by `sudo` for packages on Linux (not needed when running as root).
+- **Signing in** afterwards: run `claude` once (autonomOS needs it), and `gh auth login`.
 
 ## Manual install
 
 ```bash
-git clone https://github.com/ComeOnGetMe/dotfiles.git ~/.dotfiles
+git clone https://github.com/alanyan7/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./install.sh
 ```
@@ -36,7 +41,7 @@ Run individual installers if you only want some components:
 ./install-brew.sh             # Homebrew (macOS only; asks for your password)
 ./install-gh.sh               # GitHub CLI
 ./install-tmux.sh             # tmux + config
-./install-vim.sh              # vim + Vundle plugins
+./install-vim.sh              # vim (if missing) + Vundle plugins
 ./install-claude.sh           # Claude Code config (missing files only)
 ./install-claude.sh --force   # Claude Code config (overwrite existing)
 ./install-autonomos.sh        # autonomOS (skips if already installed)
@@ -44,7 +49,7 @@ Run individual installers if you only want some components:
 
 ## Claude Code config
 
-Claude Code itself must already be installed (`claude` on PATH or in `~/.local/bin`); the scripts check for it first and stop with install instructions if it's missing, before changing anything.
+If `claude` isn't on PATH or in `~/.local/bin`, `install-claude.sh` installs it first with the official installer.
 
 `install-claude.sh` is conservative by default — it only installs files that don't already exist on the target machine. Pass `--force` to overwrite (the existing `~/.claude/settings.json` is backed up first).
 

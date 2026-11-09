@@ -8,8 +8,9 @@ error() { printf '\033[1;31m==> %s\033[0m\n' "$*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 
-# Don't let `brew install` ask [y/n].
-export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1
+# Don't let `brew install` or apt ask questions.
+export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1 DEBIAN_FRONTEND=noninteractive
+SUDO=sudo; [ "$(id -u)" -eq 0 ] && SUDO=""
 
 if command -v gh >/dev/null 2>&1; then
   info "gh already installed ($(gh --version | head -1)), skipping."
@@ -26,14 +27,25 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   fi
   brew install gh
 elif command -v apt-get >/dev/null 2>&1; then
-  sudo apt-get update -qq
-  sudo apt-get install -y gh
+  $SUDO apt-get update -qq
+  if ! $SUDO apt-get install -y gh; then
+    # Older Debian/Ubuntu don't package gh; use GitHub's own apt repository.
+    info "gh not in the default repositories; adding GitHub's apt repository..."
+    $SUDO mkdir -p -m 755 /etc/apt/keyrings
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      | $SUDO tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
+    $SUDO chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      | $SUDO tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+    $SUDO apt-get update -qq
+    $SUDO apt-get install -y gh
+  fi
 elif command -v dnf >/dev/null 2>&1; then
-  sudo dnf install -y gh
+  $SUDO dnf install -y gh
 elif command -v yum >/dev/null 2>&1; then
-  sudo yum install -y gh
+  $SUDO yum install -y gh
 elif command -v pacman >/dev/null 2>&1; then
-  sudo pacman -Sy --noconfirm github-cli
+  $SUDO pacman -Sy --noconfirm github-cli
 else
   error "No supported package manager found. Install gh manually: https://cli.github.com"
   exit 1

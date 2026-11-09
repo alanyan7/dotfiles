@@ -1,13 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ── Non-interactive: assume yes everywhere ──
+# HOMEBREW_NO_ASK stops `brew install` asking [y/n] (ask mode is on by default
+# in newer Homebrew); DEBIAN_FRONTEND stops apt packages asking questions.
+# Exported, so the sub-installers inherit them.
+export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1 DEBIAN_FRONTEND=noninteractive
+
+# Linux package installs need root; skip sudo when already root (e.g. a bare
+# container, which often has no sudo installed).
+SUDO=sudo; [ "$(id -u)" -eq 0 ] && SUDO=""
+
 # ── Bootstrap: support both local and remote (curl | bash) execution ──
-DOTFILES_REPO="https://github.com/ComeOnGetMe/dotfiles.git"
+DOTFILES_REPO="https://github.com/alanyan7/dotfiles.git"
+DOTFILES_RAW="https://raw.githubusercontent.com/alanyan7/dotfiles/master"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 
 # When piped from curl, BASH_SOURCE is empty — clone the repo first.
 # When run as ./install.sh from inside the repo, skip straight ahead.
 if [ -z "${BASH_SOURCE[0]:-}" ] || [ ! -f "$(dirname "${BASH_SOURCE[0]}")/install-tmux.sh" ]; then
+  # On a bare Mac, /usr/bin/git is only a stub until the Command Line Tools
+  # are installed. Homebrew's installer sets them up without a GUI prompt, so
+  # install it before cloning.
+  if [[ "$OSTYPE" == "darwin"* ]] && ! xcode-select -p >/dev/null 2>&1; then
+    echo "==> Bootstrapping: installing Homebrew (also sets up git)"
+    bash <(curl -fsSL "$DOTFILES_RAW/install-brew.sh")
+  elif [[ "$OSTYPE" != "darwin"* ]] && ! command -v git >/dev/null 2>&1; then
+    echo "==> Bootstrapping: installing git"
+    if command -v apt-get >/dev/null 2>&1; then
+      $SUDO apt-get update -qq && $SUDO apt-get install -y git
+    elif command -v dnf >/dev/null 2>&1; then
+      $SUDO dnf install -y git
+    elif command -v yum >/dev/null 2>&1; then
+      $SUDO yum install -y git
+    elif command -v pacman >/dev/null 2>&1; then
+      $SUDO pacman -Sy --noconfirm git
+    else
+      echo "==> git is required. Install it, then re-run this script." >&2
+      exit 1
+    fi
+  fi
   echo "==> Bootstrapping: cloning dotfiles into $DOTFILES_DIR"
   if [ ! -d "$DOTFILES_DIR" ]; then
     git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
@@ -18,11 +50,6 @@ else
 fi
 
 SCRIPT_DIR="$(pwd -P)"
-
-# ── Non-interactive: assume yes everywhere ──
-# HOMEBREW_NO_ASK stops `brew install` asking [y/n] (ask mode is on by default
-# in newer Homebrew). Exported, so the sub-installers inherit both.
-export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1
 
 # ── Helpers ──
 
@@ -51,17 +78,6 @@ if ! command -v curl >/dev/null 2>&1; then
   exit 1
 fi
 
-# Claude Code is expected to be installed already; check before changing
-# anything so a missing CLI doesn't leave a half-finished setup.
-# The native installer puts it in ~/.local/bin, which may not be on PATH yet.
-case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
-if ! command -v claude >/dev/null 2>&1; then
-  error "Claude Code (claude) is required but not installed."
-  error "Install it first, then re-run this script:"
-  error "  curl -fsSL https://claude.ai/install.sh | bash"
-  exit 1
-fi
-
 # ── Homebrew (macOS) ──
 # Installed up front so later steps (zsh, tmux) can use it. Exported PATH
 # reaches the sub-installers too.
@@ -83,11 +99,11 @@ if ! command -v zsh >/dev/null 2>&1; then
   if [[ "$OSTYPE" == "darwin"* ]]; then
     brew install zsh
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get update && sudo apt-get install -y zsh
+    $SUDO apt-get update && $SUDO apt-get install -y zsh
   elif command -v yum >/dev/null 2>&1; then
-    sudo yum install -y zsh
+    $SUDO yum install -y zsh
   elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Sy --noconfirm zsh
+    $SUDO pacman -Sy --noconfirm zsh
   else
     error "Could not install zsh. Please install it manually."
     exit 1
@@ -158,6 +174,9 @@ cp "$SCRIPT_DIR/zshrc.local" "$ZSHRC_LOCAL"
 
 info "Installing tmux..."
 "$SCRIPT_DIR/install-tmux.sh"
+
+info "Installing vim..."
+"$SCRIPT_DIR/install-vim.sh"
 
 info "Installing GitHub CLI..."
 "$SCRIPT_DIR/install-gh.sh"
