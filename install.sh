@@ -165,6 +165,9 @@ info "Installing GitHub CLI..."
 info "Installing Claude Code config..."
 "$SCRIPT_DIR/install-claude.sh"
 
+info "Installing autonomOS..."
+"$SCRIPT_DIR/install-autonomos.sh"
+
 # ── Done ──
 
 echo ""

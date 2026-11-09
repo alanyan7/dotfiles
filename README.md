@@ -10,6 +10,7 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 - **tmux** with mouse support, vim-aware pane navigation, and intuitive split bindings
 - **vim** with Vundle plugins and solarized colors
 - **Claude Code config**: `CLAUDE.md`, personal skills, statusline, and `settings.json`
+- **[autonomOS](https://github.com/aterrylu/autonomOS)** via its official installer (plus Node.js 20+ on macOS if missing); runs as a background service and prints the dashboard URL and token
 
 ## Quick install (one-liner)
 
@@ -38,6 +39,7 @@ Run individual installers if you only want some components:
 ./install-vim.sh              # vim + Vundle plugins
 ./install-claude.sh           # Claude Code config (missing files only)
 ./install-claude.sh --force   # Claude Code config (overwrite existing)
+./install-autonomos.sh        # autonomOS (skips if already installed)
 ```
 
 ## Claude Code config
