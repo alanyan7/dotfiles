@@ -7,15 +7,19 @@ error() { printf '\033[1;31m==> %s\033[0m\n' "$*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 
+# Don't let `brew install` ask [y/n] when this script runs on its own.
+export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1
+
 # ── Install tmux ──
 
 if ! command -v tmux >/dev/null 2>&1; then
   info "Installing tmux..."
   if [[ "$OSTYPE" == "darwin"* ]]; then
     if ! command -v brew >/dev/null 2>&1; then
-      error "Homebrew is required to install tmux on macOS."
-      error "Install it first: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-      exit 1
+      "$SCRIPT_DIR/install-brew.sh"
+      for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+        if [ -x "$b" ]; then eval "$("$b" shellenv)"; break; fi
+      done
     fi
     brew install tmux
   else

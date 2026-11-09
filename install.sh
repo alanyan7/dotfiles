@@ -19,6 +19,11 @@ fi
 
 SCRIPT_DIR="$(pwd -P)"
 
+# ── Non-interactive: assume yes everywhere ──
+# HOMEBREW_NO_ASK stops `brew install` asking [y/n] (ask mode is on by default
+# in newer Homebrew). Exported, so the sub-installers inherit both.
+export NONINTERACTIVE=1 HOMEBREW_NO_ASK=1
+
 # ── Helpers ──
 
 info()  { printf '\033[1;34m==> %s\033[0m\n' "$*"; }
@@ -44,6 +49,32 @@ fi
 if ! command -v curl >/dev/null 2>&1; then
   error "curl is required but not installed. Please install curl first."
   exit 1
+fi
+
+# Claude Code is expected to be installed already; check before changing
+# anything so a missing CLI doesn't leave a half-finished setup.
+# The native installer puts it in ~/.local/bin, which may not be on PATH yet.
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+if ! command -v claude >/dev/null 2>&1; then
+  error "Claude Code (claude) is required but not installed."
+  error "Install it first, then re-run this script:"
+  error "  curl -fsSL https://claude.ai/install.sh | bash"
+  exit 1
+fi
+
+# ── Homebrew (macOS) ──
+# Installed up front so later steps (zsh, tmux) can use it. Exported PATH
+# reaches the sub-installers too.
+
+load_brew() {
+  for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [ -x "$b" ]; then eval "$("$b" shellenv)"; return 0; fi
+  done
+}
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  "$SCRIPT_DIR/install-brew.sh"
+  load_brew
 fi
 
 # Ensure zsh is available
