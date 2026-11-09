@@ -4,7 +4,9 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 
 ## What's included
 
+- **Homebrew** on macOS, installed first if missing (needs your password once)
 - **zsh** with [Oh My Zsh](https://ohmyz.sh/), custom plugins (autosuggestions, syntax highlighting, navigation tools), and the `tjkirch` theme
+- **GitHub CLI** (`gh`); sign in afterwards with `gh auth login`
 - **tmux** with mouse support, vim-aware pane navigation, and intuitive split bindings
 - **vim** with Vundle plugins and solarized colors
 - **Claude Code config**: `CLAUDE.md`, personal skills, statusline, and `settings.json`
@@ -30,6 +32,8 @@ cd ~/.dotfiles
 Run individual installers if you only want some components:
 
 ```bash
+./install-brew.sh             # Homebrew (macOS only; asks for your password)
+./install-gh.sh               # GitHub CLI
 ./install-tmux.sh             # tmux + config
 ./install-vim.sh              # vim + Vundle plugins
 ./install-claude.sh           # Claude Code config (missing files only)
@@ -37,6 +41,8 @@ Run individual installers if you only want some components:
 ```
 
 ## Claude Code config
+
+Claude Code itself must already be installed (`claude` on PATH or in `~/.local/bin`); the scripts check for it first and stop with install instructions if it's missing, before changing anything.
 
 `install-claude.sh` is conservative by default — it only installs files that don't already exist on the target machine. Pass `--force` to overwrite (the existing `~/.claude/settings.json` is backed up first).
 
