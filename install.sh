@@ -110,6 +110,16 @@ if ! command -v zsh >/dev/null 2>&1; then
   fi
 fi
 
+# Make zsh the login shell on Linux (macOS already defaults to it); most
+# distros default to bash, which would never read the config below.
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  ZSH_BIN="$(command -v zsh)"
+  if [ "$(getent passwd "$(id -un)" | cut -d: -f7)" != "$ZSH_BIN" ]; then
+    info "Setting login shell to $ZSH_BIN..."
+    $SUDO chsh -s "$ZSH_BIN" "$(id -un)"
+  fi
+fi
+
 # ── Oh My Zsh ──
 
 if [ ! -d "$HOME/.oh-my-zsh" ]; then

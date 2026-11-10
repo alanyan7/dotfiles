@@ -5,7 +5,7 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 ## What's included
 
 - **Homebrew** on macOS, installed first if missing (needs your password once; also provides git on a bare Mac)
-- **zsh** with [Oh My Zsh](https://ohmyz.sh/), custom plugins (autosuggestions, syntax highlighting, navigation tools), and the `tjkirch` theme
+- **zsh** with [Oh My Zsh](https://ohmyz.sh/), custom plugins (autosuggestions, syntax highlighting, navigation tools), and the `tjkirch` theme; made the login shell on Linux
 - **GitHub CLI** (`gh`); sign in afterwards with `gh auth login`
 - **tmux** with mouse support, vim-aware pane navigation, and intuitive split bindings
 - **vim** with Vundle plugins and solarized colors
