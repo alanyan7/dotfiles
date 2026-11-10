@@ -49,9 +49,11 @@ if ! node_ok; then
       aarch64|arm64) arch=arm64 ;;
       *) error "No official Node.js build for $(uname -m). Install Node 20+ manually, then re-run."; exit 1 ;;
     esac
-    # index.json lists releases newest first; take the first LTS one.
+    # index.json lists releases newest first; take the first LTS one. awk
+    # reads to the end (head would close the pipe early, and with pipefail
+    # the SIGPIPE upstream fails the script).
     version="$(curl -fsSL https://nodejs.org/dist/index.json | tr '{' '\n' \
-      | grep -v '"lts":false' | grep -o '"version":"v[0-9.]*"' | head -1 | cut -d'"' -f4)"
+      | grep -v '"lts":false' | grep -o '"version":"v[0-9.]*"' | awk -F'"' 'NR==1 {print $4}')"
     tarball="node-$version-linux-$arch.tar.gz"
     info "Installing Node.js $version to ~/.local/node..."
     tmp="$(mktemp -d)"
