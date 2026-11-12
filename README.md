@@ -9,7 +9,7 @@ Dev environment setup. Tested on macOS and Linux (Debian/Ubuntu, Fedora, Arch).
 - **GitHub CLI** (`gh`); sign in afterwards with `gh auth login`
 - **tmux** with mouse support, vim-aware pane navigation, and intuitive split bindings
 - **vim** with Vundle plugins and solarized colors
-- **Claude Code** (installed if missing) and its config: `CLAUDE.md`, personal skills, statusline, and `settings.json`
+- **Claude Code** (installed if missing) and its config: `CLAUDE.md`, personal skills, agent personas (multi-agent org), statusline, and `settings.json`
 - **[autonomOS](https://github.com/aterrylu/autonomOS)** via its official installer (plus Node.js 20+ if missing: Homebrew on macOS, the official build in `~/.local` on Linux); runs as a background service and prints the dashboard URL and token
 
 ## Quick install (one-liner)
@@ -44,6 +44,7 @@ Run individual installers if you only want some components:
 ./install-vim.sh              # vim (if missing) + Vundle plugins
 ./install-claude.sh           # Claude Code config (missing files only)
 ./install-claude.sh --force   # Claude Code config (overwrite existing)
+./install-claude.sh --link    # symlink agent personas so edits land in this repo
 ./install-autonomos.sh        # autonomOS (skips if already installed)
 ```
 
@@ -57,10 +58,21 @@ What it installs:
 
 - `~/.claude/CLAUDE.md` — global behavioral guidelines (Karpathy-inspired)
 - `~/.claude/skills/<name>/` — personal skills
+- `~/.claude/agents/<name>.md` — agent personas for a multi-agent org (see below); `--link` symlinks them to this repo instead of copying
 - `~/.claude/statusline-command.sh` — statusline script
 - `~/.claude/settings.json` — preferences (theme, hooks, permissions)
 
 After install, sign in with `claude auth login` and restart any running Claude Code sessions.
+
+### Multi-agent org
+
+`claude/agents/` defines a small org of Claude Code sessions, each in its own git worktree:
+
+- `chief-of-staff.md` — the one session you talk to, always named **Zaq** (`CoS · Zaq`); routes work, never builds
+- `eng-lead.md` — plans architecture, splits work into features, starts and reviews workers (`L · <Name>: <topic>`)
+- `feature-worker.md` — builds one feature or fix in its own worktree and opens one PR (`W · <Name>: <topic>`)
+
+Machine- or employer-specific details (which repos, PR target branches, ticket tracker and chat tools, the live list of session names in use) go in `~/.claude/agent-org.local.md`, which every persona reads if present. It is never committed here. Install with `--link` to keep improving the personas from any session and commit the changes in this repo.
 
 ## Customization
 

@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # Install Claude Code (if missing) and personal config: CLAUDE.md, skills,
-# statusline, settings.
+# agents, statusline, settings.
 # Conservative by default — never clobbers existing files. Re-running on a
 # machine that already has things set up only fills in what's missing.
 #
 # Pass --force (or set FORCE=1) to overwrite existing files. settings.json is
 # always backed up before being overwritten.
+#
+# Pass --link (or set LINK=1) to symlink agents/*.md into ~/.claude/agents
+# instead of copying them, so edits made there land in this repo.
 #
 # Uses `cp` only (no rsync).
 set -euo pipefail
@@ -15,15 +18,18 @@ SRC="$SCRIPT_DIR/claude"
 DST="$HOME/.claude"
 
 FORCE="${FORCE:-0}"
+LINK="${LINK:-0}"
 for arg in "$@"; do
   case "$arg" in
     --force|-f) FORCE=1 ;;
+    --link) LINK=1 ;;
     -h|--help)
       cat <<USAGE
-Usage: install-claude.sh [--force]
+Usage: install-claude.sh [--force] [--link]
 
   Default: install missing files only; existing files are left untouched.
   --force: overwrite existing files (settings.json is backed up first).
+  --link:  symlink agents/*.md instead of copying (edits land in this repo).
 USAGE
       exit 0 ;;
     *) echo "Unknown arg: $arg" >&2; exit 1 ;;
@@ -54,7 +60,7 @@ else
   info "claude installed: $(claude --version 2>/dev/null | head -1)"
 fi
 
-mkdir -p "$DST" "$DST/skills"
+mkdir -p "$DST" "$DST/skills" "$DST/agents"
 
 # ── settings.json ── (template: __HOME__ → $HOME)
 if [ -f "$DST/settings.json" ] && [ "$FORCE" != "1" ]; then
@@ -105,6 +111,33 @@ for dir in "$SRC"/skills/*/; do
     info "  installing skill: $name"
   fi
   cp -R "$dir" "$target"
+done
+
+# ── agents (one persona file each) ──
+info "Installing agents"
+for file in "$SRC"/agents/*.md; do
+  [ -f "$file" ] || continue
+  name="$(basename "$file")"
+  target="$DST/agents/$name"
+  if [ "$LINK" = "1" ] && [ "$(readlink "$target" 2>/dev/null)" = "$file" ]; then
+    skip "  agent already linked: $name"
+    continue
+  fi
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    if [ "$FORCE" != "1" ]; then
+      skip "  agent already installed: $name"
+      continue
+    fi
+    info "  refreshing agent: $name"
+    rm -f "$target"
+  else
+    info "  installing agent: $name"
+  fi
+  if [ "$LINK" = "1" ]; then
+    ln -s "$file" "$target"
+  else
+    cp "$file" "$target"
+  fi
 done
 
 info "Done."
